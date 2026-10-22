@@ -1,28 +1,28 @@
 :root {
-  --paper: #f5f1e8;
-  --ink: #1d1b16;
-  --muted: #6b6558;
-  --rule: #d9d2c1;
+  --ink: #1c1a15;
+  --muted: #5f5a4d;
+  --rule: #cfc7b4;
   --accent: #b4532a;
-  color-scheme: light dark;
+  --paper-bg: #f4f0e6;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --paper: #15140f;
     --ink: #ece7da;
-    --muted: #9c9584;
-    --rule: #2d2a22;
+    --muted: #a39c8a;
+    --rule: #3a362c;
     --accent: #e08a5e;
+    --paper-bg: #16150f;
   }
 }
 
 :root[data-theme='dark'] {
-  --paper: #15140f;
   --ink: #ece7da;
-  --muted: #9c9584;
-  --rule: #2d2a22;
+  --muted: #a39c8a;
+  --rule: #3a362c;
   --accent: #e08a5e;
+  --paper-bg: #16150f;
 }
 
 * {
@@ -31,108 +31,394 @@
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--paper-bg);
   color: var(--ink);
   font-family: 'Geist', system-ui, sans-serif;
-  line-height: 1.6;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-.page {
-  max-width: 760px;
+/* The clock: every window reads --p and computes its own --t. */
+.timed {
+  --t: clamp(0, (var(--p, 0) - var(--a, 0)) / (var(--b, 1) - var(--a, 0)), 1);
+}
+
+.paper-stage,
+.stage {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: url('/vox/paper.svg') repeat var(--paper-bg);
+  background-size: 400px 400px;
+}
+
+.paper-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 64px 16px 96px;
+}
+
+/* Grain: a paper layer whose offset jumps on the texture beat. */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url('/vox/paper.svg');
+  background-size: 400px 400px;
+  background-position: var(--grain-x, 0) 0;
+  mix-blend-mode: multiply;
+  opacity: 0.22;
+  z-index: 0;
+}
+
+/* Soft inset vignette over every stage. */
+.stage::after,
+.paper-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px rgba(40, 30, 10, 0.18);
+  z-index: 0;
+}
+
+.title-card .paper-stage,
+.end-card .paper-stage {
+  z-index: 0;
+}
+
+.title-card h1,
+.end-card .doors,
+.end-card .foot,
+.eyebrow,
+.lede,
+.scroll-hint {
+  position: relative;
+  z-index: 1;
 }
 
 .eyebrow,
-.stack {
+.stack,
+.card-no,
+.panel-no,
+.scroll-hint {
   font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
   color: var(--muted);
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 h1 {
-  font-size: clamp(2.4rem, 7vw, 3.6rem);
-  line-height: 1.05;
-  margin: 8px 0 16px;
+  font-size: clamp(2.6rem, 9vw, 5.2rem);
+  line-height: 1;
+  margin: 8px 0 18px;
   font-weight: 600;
-}
-
-h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 16px;
-  padding-top: 24px;
-  border-top: 1px solid var(--rule);
-}
-
-h3 {
-  margin: 0 0 4px;
-  font-size: 1.05rem;
-  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .lede {
-  font-size: 1.1rem;
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
   color: var(--muted);
-  max-width: 56ch;
-  margin: 0 0 24px;
+  max-width: 52ch;
+  margin: 0;
 }
 
-.links {
+.scroll-hint {
+  margin-top: 40px;
+}
+
+/* Torn colour bars on the title card. */
+.bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22px;
+  mask: url('/vox/torn.svg') 0 50% / 100% 100% no-repeat;
+  z-index: 0;
+}
+.bar-blue { top: 14%; background: #2f6fdb; }
+.bar-red { top: 46%; background: #d9482b; }
+.bar-yellow { top: 78%; background: #e8b923; }
+
+.chapter,
+.title-card,
+.end-card {
+  position: relative;
+}
+
+.chapter {
+  height: calc(var(--len) * 100svh);
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--c);
+  transform: translateY(calc(var(--t) * -100%));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16px;
+  color: #fbf8f0;
+  max-width: none;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -54px;
+  height: 60px;
+  background: var(--c);
+  mask: url('/vox/torn.svg') 0 0 / 100% 100% no-repeat;
+}
+
+.card h2 {
+  font-size: clamp(3rem, 12vw, 7rem);
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  padding-left: max(0px, calc((100vw - 880px) / 2));
+}
+
+.card-no {
+  color: rgba(251, 248, 240, 0.8);
+  padding-left: max(0px, calc((100vw - 880px) / 2));
+}
+
+/* Highlighter: yellow swipes left to right behind a phrase. */
+.hl {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  isolation: auto;
+}
+
+.hl::before {
+  content: '';
+  position: absolute;
+  inset: -2px -6px;
+  background: #ffd23f;
+  mask: url('/vox/highlighter.svg') 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url('/vox/highlighter.svg') 0 0 / 100% 100% no-repeat;
+  clip-path: inset(0 calc((1 - var(--t)) * 100%) 0 0);
+  mix-blend-mode: multiply;
+  z-index: -1;
+}
+
+/* Marker circle: scanned ellipse intersected with a conic sweep. */
+.ring {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ring::after {
+  content: '';
+  position: absolute;
+  inset: -22% -10%;
+  background: #d9302a;
+  mask: url('/vox/circle.svg') center / 100% 100% no-repeat,
+    conic-gradient(from 20deg, #000 calc(var(--t) * 360deg), transparent 0);
+  mask-composite: intersect;
+  -webkit-mask: url('/vox/circle.svg') center / 100% 100% no-repeat,
+    conic-gradient(from 20deg, #000 calc(var(--t) * 360deg), transparent 0);
+  -webkit-mask-composite: source-in;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Camera wrapper: transform only, no will-change. */
+.doc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(880px, 92vw);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-size: clamp(1.5rem, 4.6vw, 2.9rem);
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper-bg);
+  padding: 48px 40px;
+  border: 1px solid var(--rule);
+}
+
+.doc-line {
+  margin: 0 0 0.6em;
+}
+
+/* Entrance: the slap lands oversized and turned, then eases out. */
+.slap {
+  opacity: clamp(0, calc(var(--t) * 4), 1);
+  --e: calc((1 - var(--t)) * (1 - var(--t)));
+  transform: rotate(calc(var(--r, 0deg) - 6deg * var(--e))) scale(calc(1 + 0.3 * var(--e)));
+}
+
+.learn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(880px, 92vw);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
+}
+
+.learn li {
+  background: var(--paper-bg);
+  border: 1px solid var(--rule);
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.learn strong {
+  display: block;
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.learn span {
+  color: var(--muted);
+}
+
+/* Timeline: three panels, the camera pans between them. */
+.pan {
+  position: absolute;
+  inset: 0;
+  width: 300%;
+  display: flex;
+  z-index: 1;
+}
+
+.panel {
+  position: relative;
+  width: 33.3333%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 max(16px, calc((100vw - 880px) / 2 + 16px));
+  background: var(--paper-bg);
+  border-right: 1px solid var(--rule);
+}
+
+.panel h3 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  margin: 8px 0 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.panel p {
+  margin: 0 0 10px;
+  max-width: 48ch;
+  font-size: 1.1rem;
+}
+
+.pin {
+  position: absolute;
+  width: 180px;
+  opacity: 0.9;
+  transform: rotate(-4deg);
+}
+.pin-top { top: 12%; right: 12%; }
+.pin-middle { top: 54%; right: 9%; transform: rotate(5deg); }
+.pin-bottom { bottom: 10%; right: 14%; transform: rotate(-2deg); }
+
+/* End card. */
+.end-card .paper-stage {
+  height: 100svh;
+  min-height: 60vh;
+}
+
+.doors {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
+  margin-top: 28px;
 }
 
-.links a,
-.foot a {
+.doors a {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px solid var(--accent);
-}
-
-.section {
-  margin-top: 56px;
-}
-
-.projects,
-.learning {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.projects li,
-.learning li {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--rule);
-}
-
-.projects p,
-.learning span {
-  margin: 0;
-  display: block;
-}
-
-.learning strong {
-  display: block;
-  margin-bottom: 2px;
-}
-
-.muted {
-  color: var(--muted);
+  font-size: 1.2rem;
+  padding-bottom: 2px;
 }
 
 .foot {
-  margin-top: 72px;
+  margin-top: 56px;
   font-size: 0.85rem;
   color: var(--muted);
 }
 
-@media (max-width: 480px) {
-  .page {
-    padding-top: 40px;
+/* Reduced motion: no loop, everything shown, nothing sticky or moving. */
+.still {
+  --p: 1;
+}
+
+.still .chapter {
+  height: auto;
+}
+
+.still .stage {
+  position: relative;
+  height: auto;
+  min-height: 100svh;
+}
+
+.still .pan {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  flex-direction: column;
+  transform: none !important;
+}
+
+.still .panel {
+  width: 100%;
+  min-height: 60vh;
+}
+
+.still .card {
+  position: relative;
+  min-height: 40vh;
+  transform: none;
+}
+
+.still .doc,
+.still .learn {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  margin: 40px auto;
+}
+
+.still .doc,
+.still .learn,
+.still .card {
+  --t: 1;
+}
+
+@media (max-width: 640px) {
+  .doc {
+    padding: 32px 22px;
+  }
+  .pin {
+    width: 120px;
   }
 }
