@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { useClock } from './useClock.js'
 import content from './data/content.json'
+import './vox.css'
 
 const { stats, build, learn, links, home, now } = content
 
 const cam = (keys) => JSON.stringify(keys)
 const win = (a, b, extra) => ({ '--a': a, '--b': b, ...extra })
 
+// Starts false so the server render matches; the browser corrects it on mount.
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
+  const [reduced, setReduced] = useState(false)
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
     const sync = () => setReduced(mq.matches)
+    sync()
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
@@ -74,7 +75,9 @@ function TitleCard() {
           Thakur
         </h1>
         <p className="lede">{content.tagline}</p>
-        <p className="scroll-cue">Scroll to play</p>
+        <p className="scroll-cue">
+          Scroll to play &middot; <a href="/blog/">Read the devlog</a>
+        </p>
       </div>
       <figure className="cutout">
         <img src="/vox/cutout.webp" alt="Abhishek Thakur as a halftone newspaper cut-out" width="900" height="891" />
@@ -219,7 +222,10 @@ function EndCard() {
       <div className="end-copy">
         <p className="kicker">Next chapter</p>
         <h2>A devlog of what each project teaches me, in writing first, then video.</h2>
-        <nav className="doors" aria-label="Contact">
+        <nav className="doors" aria-label="Devlog and contact">
+          <a className="torn door" style={{ '--c': '#1b1915' }} href="/blog/">
+            Devlog
+          </a>
           {links.map((link) => (
             <a key={link.label} className="torn door" style={{ '--c': link.color }} href={link.href}>
               {link.label}

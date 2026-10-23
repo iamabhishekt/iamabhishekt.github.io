@@ -1,19 +1,27 @@
 {
   "name": "iamabhishekt.github.io",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "new": "node scripts/new-post.mjs",
+    "check": "astro check"
   },
   "dependencies": {
+    "@astrojs/mdx": "4.3.14",
+    "@astrojs/react": "4.4.2",
+    "@astrojs/rss": "4.0.19",
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "5.18.2",
+    "mermaid": "11.17.2",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "4.3.4",
-    "vite": "5.4.11"
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
   }
 }

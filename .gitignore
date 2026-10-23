@@ -1,7 +1,23 @@
 node_modules/
 dist/
+.astro/
 .DS_Store
 
-# Universal Brain link
+# Universal Brain attach links (local only, never publish)
 brain
-
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+skills-lock.json
+.agents
+.claude
+.codebuddy
+.codex
+.cursor
+.dsh
+.gemini
+.kilocode
+.mcp.json
+.opencode
+.qwen
+.trae

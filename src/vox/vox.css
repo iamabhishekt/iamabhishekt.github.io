@@ -163,6 +163,11 @@ h1 {
   margin-top: 36px;
 }
 
+.scroll-cue a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+
 .cutout {
   margin: 0;
   justify-self: center;
@@ -529,7 +534,7 @@ h1 {
   overflow: hidden;
   display: grid;
   align-items: center;
-  padding: 12svh max(16px, 8vw);
+  padding: 8svh max(16px, 8vw);
 }
 
 .end-copy {
@@ -541,10 +546,10 @@ h1 {
 .end h2 {
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(2rem, 5.4vw, 4.2rem);
+  font-size: clamp(2rem, 4.6vw, 3.6rem);
   line-height: 1;
   letter-spacing: -0.03em;
-  margin: 14px 0 28px;
+  margin: 14px 0 24px;
 }
 
 .doors {
@@ -556,11 +561,11 @@ h1 {
 /* The torn strip's solid band is the middle half, so the padding is generous. */
 .door {
   display: block;
-  padding: 40px 34px;
+  padding: 32px 34px;
   color: #fffaf0;
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
   text-decoration: none;
   transition: translate 0.25s ease;
 }

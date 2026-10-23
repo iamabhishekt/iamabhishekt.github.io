@@ -1,0 +1,118 @@
+---
+import { render } from 'astro:content'
+import BlogLayout from '../../layouts/BlogLayout.astro'
+import { CATEGORIES, formatDate, readingMinutes } from '../../blog/categories'
+import { getPosts, type Post } from '../../blog/posts'
+
+export async function getStaticPaths() {
+  const posts = await getPosts()
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }))
+}
+
+interface Props {
+  post: Post
+  posts: Post[]
+}
+
+const { post, posts } = Astro.props
+const { title, description, date, category, tags, output } = post.data
+const { Content, headings } = await render(post)
+const toc = headings.filter((h) => h.depth === 2)
+const cat = CATEGORIES[category]
+const more = posts.filter((p) => p.id !== post.id).slice(0, 3)
+---
+
+<BlogLayout title={`${title} · Abhishek Thakur`} description={description} type="article">
+  <main class="post" style={{ '--c': cat.color }}>
+    <a class="back" href="/blog/">&larr; Devlog</a>
+
+    <header class="post-head">
+      <p class="post-kicker">
+        <span class="tag">{cat.label}</span>
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        <span>{readingMinutes(post.body)} min read</span>
+      </p>
+      <h1>{title}</h1>
+      <p class="post-lede">{description}</p>
+      <div class="mode" role="group" aria-label="Reading mode">
+        <button type="button" data-mode="human" aria-pressed="true">Human</button>
+        <button type="button" data-mode="agent" aria-pressed="false">Agent</button>
+      </div>
+    </header>
+
+    {
+      output && (
+        <figure class="live">
+          <div class="live-bar">
+            <span class="live-dots" aria-hidden="true" />
+            <a href={output}>Open the live page &rarr;</a>
+          </div>
+          <iframe src={output} title={`Live page: ${title}`} loading="lazy" />
+        </figure>
+      )
+    }
+
+    <div class="post-grid">
+      <article class="prose" data-view="human">
+        <Content />
+        {tags.length > 0 && (
+          <p class="post-tags">
+            {tags.map((tag) => (
+              <span>#{tag}</span>
+            ))}
+          </p>
+        )}
+      </article>
+
+      <article class="agent" data-view="agent" hidden>
+        <p class="agent-note">
+          Plain Markdown, for agents and copy-paste. Also served at
+          <a href={`/blog/${post.id}.md`}>/blog/{post.id}.md</a>.
+        </p>
+        <pre><code>{post.body}</code></pre>
+      </article>
+
+      {
+        toc.length > 1 && (
+          <nav class="toc" aria-label="On this page">
+            <p class="kicker">On this page</p>
+            <ol>
+              {toc.map((h, i) => (
+                <li>
+                  <a href={`#${h.slug}`}>
+                    <span>{String(i + 1).padStart(2, '0')}</span>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </div>
+
+    {
+      more.length > 0 && (
+        <section class="more" aria-label="Keep reading">
+          <p class="kicker">Keep reading</p>
+          <ul>
+            {more.map((p) => (
+              <li>
+                <a href={`/blog/${p.id}/`}>
+                  <span class="tag" style={{ '--c': CATEGORIES[p.data.category].color }}>
+                    {CATEGORIES[p.data.category].label}
+                  </span>
+                  <span class="post-title">{p.data.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </main>
+
+  <script>
+    import '../../blog/post-client'
+  </script>
+</BlogLayout>

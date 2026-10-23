@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string
+  description: string
+  type?: 'website' | 'article'
+}
+
+const { title, description, type = 'website' } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta name="theme-color" content="#ece9e1" />
+<link
+  rel="icon"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232f5fd0'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='16' text-anchor='middle' fill='%23fffaf0'%3EAT%3C/text%3E%3C/svg%3E"
+/>
+<link rel="alternate" type="application/rss+xml" title="Abhishek Thakur: devlog" href="/rss.xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Geist+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>

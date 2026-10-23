@@ -1,0 +1,17 @@
+---
+import Head from '../components/Head.astro'
+import VoxPage from '../vox/VoxPage.jsx'
+---
+
+<html lang="en">
+  <head>
+    <Head
+      title="Abhishek Thakur"
+      description="Abhishek Thakur: from Thane, working in New Jersey at Limosys in React, TypeScript and JavaScript. Learning Rust and forward-deployed engineering in public."
+    />
+    <link rel="preload" as="image" href="/vox/paper.webp" />
+  </head>
+  <body>
+    <VoxPage client:load />
+  </body>
+</html>

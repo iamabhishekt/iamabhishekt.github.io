@@ -1,0 +1,71 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro'
+import { CATEGORIES, formatDate, readingMinutes } from '../../blog/categories'
+import { getPosts } from '../../blog/posts'
+
+const posts = await getPosts()
+---
+
+<BlogLayout
+  title="Devlog · Abhishek Thakur"
+  description="What each project teaches me: Rust, C, React, forward-deployed engineering. Written as I learn it."
+>
+  <main class="index">
+    <p class="kicker">Devlog</p>
+    <h1>What each project teaches me</h1>
+    <p class="index-lede">
+      Notes from building things from scratch and shipping them at work. Diagrams included, mistakes left in.
+    </p>
+
+    <div class="filters" role="group" aria-label="Filter by category">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      {
+        Object.entries(CATEGORIES).map(([key, { label, color }]) => (
+          <button type="button" data-filter={key} aria-pressed="false" style={{ '--c': color }}>
+            {label}
+          </button>
+        ))
+      }
+    </div>
+
+    {posts.length === 0 && <p class="empty">First posts are on the way.</p>}
+
+    <ol class="post-list">
+      {
+        posts.map((post) => {
+          const cat = CATEGORIES[post.data.category]
+          return (
+            <li data-category={post.data.category}>
+              <a href={`/blog/${post.id}/`}>
+                <span class="tag" style={{ '--c': cat.color }}>
+                  {cat.label}
+                </span>
+                <span class="post-title">{post.data.title}</span>
+                <span class="post-desc">{post.data.description}</span>
+                <span class="post-meta">
+                  <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time> ·{' '}
+                  {readingMinutes(post.body)} min read{post.data.draft && ' · draft'}
+                </span>
+              </a>
+            </li>
+          )
+        })
+      }
+    </ol>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]')
+    const items = document.querySelectorAll<HTMLElement>('.post-list li')
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)))
+        items.forEach((item) => {
+          item.hidden = filter !== 'all' && item.dataset.category !== filter
+        })
+      }),
+    )
+  </script>
+</BlogLayout>
