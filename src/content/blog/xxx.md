@@ -8,6 +8,5 @@ tags:
   - ffsfsfsf
   - sfsfsdfsdf
   - fsdfsfsfsf
-draft: true
+draft: false
 ---
-dfdsfsffsfsfsfs
