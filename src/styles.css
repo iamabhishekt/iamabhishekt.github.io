@@ -1,371 +1,656 @@
 :root {
-  --ink: #1c1a15;
-  --muted: #5f5a4d;
-  --rule: #cfc7b4;
-  --accent: #b4532a;
-  --paper-bg: #f4f0e6;
+  --paper: #ece9e1;
+  --sheet: #fbf9f3;
+  --ink: #1b1915;
+  --muted: #5d574b;
+  --blue: #2f5fd0;
+  --red: #d6402a;
+  --yellow: #e3b021;
+  --highlight: #ffd43b;
+  --display: 'Archivo', system-ui, sans-serif;
+  --serif: 'Newsreader', Georgia, serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --lift: 0 1px 0 rgba(40, 30, 10, 0.08), 0 22px 44px -26px rgba(40, 30, 10, 0.45);
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --ink: #ece7da;
-    --muted: #a39c8a;
-    --rule: #3a362c;
-    --accent: #e08a5e;
-    --paper-bg: #16150f;
-  }
-}
-
-:root[data-theme='dark'] {
-  --ink: #ece7da;
-  --muted: #a39c8a;
-  --rule: #3a362c;
-  --accent: #e08a5e;
-  --paper-bg: #16150f;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background: var(--paper-bg);
-  color: var(--ink);
-  font-family: 'Geist', system-ui, sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+html {
+  background: var(--paper);
 }
 
-/* The clock: every window reads --p and computes its own --t. */
-.timed {
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper) url('/vox/paper.webp');
+  background-size: 512px;
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ---------- The clock: each window turns the chapter's --p into its own --t. */
+
+.k {
   --t: clamp(0, (var(--p, 0) - var(--a, 0)) / (var(--b, 1) - var(--a, 0)), 1);
 }
 
-.paper-stage,
-.stage {
-  position: relative;
-  height: 100svh;
-  overflow: hidden;
-  isolation: isolate;
-  background: url('/vox/paper.svg') repeat var(--paper-bg);
-  background-size: 400px 400px;
+/* Default entrance: lands oversized and turned, then eases out. */
+.slap {
+  --e: calc((1 - var(--t)) * (1 - var(--t)));
+  opacity: clamp(0, calc(var(--t) * 4), 1);
+  transform: rotate(calc(var(--r, 0deg) - 6deg * var(--e))) scale(calc(1 + 0.3 * var(--e)));
 }
 
-.paper-stage {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 16px;
-  max-width: 880px;
-  margin: 0 auto;
+/* ---------- Shared paper and ink */
+
+.torn {
+  background: var(--c);
+  -webkit-mask: url('/vox/torn.webp') 0 50% / 100% 100% no-repeat;
+  mask: url('/vox/torn.webp') 0 50% / 100% 100% no-repeat;
 }
 
-/* Grain: a paper layer whose offset jumps on the texture beat. */
+.tape {
+  position: absolute;
+  width: 34%;
+  max-width: 180px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tape-a {
+  top: -5%;
+  left: -7%;
+  rotate: -24deg;
+}
+
+.tape-b {
+  top: -4%;
+  right: -7%;
+  rotate: 21deg;
+}
+
+.kicker,
+.sheet-head,
+.panel-label,
+.clip-kicker,
+.clip-stack,
+.note-stack,
+.scroll-cue,
+.credit {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Grain jumps on the texture beat; the inset shadow is the vignette. */
 .grain {
   position: absolute;
   inset: 0;
+  z-index: 6;
   pointer-events: none;
-  background: url('/vox/paper.svg');
-  background-size: 400px 400px;
-  background-position: var(--grain-x, 0) 0;
+  background: url('/vox/paper.webp');
+  background-size: 512px;
+  background-position: var(--grain-x, 0) calc(var(--grain-x, 0) * -1);
   mix-blend-mode: multiply;
-  opacity: 0.22;
-  z-index: 0;
+  opacity: 0.35;
+  box-shadow: inset 0 0 140px rgba(50, 35, 10, 0.28);
 }
 
-/* Soft inset vignette over every stage. */
-.stage::after,
-.paper-stage::after {
-  content: '';
+/* ---------- Title card */
+
+.title {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: 4vw;
+  padding: 10svh max(16px, 6vw);
+}
+
+.bar {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 0 120px rgba(40, 30, 10, 0.18);
+  left: -10%;
+  right: -10%;
+  height: 30px;
+  filter: url(#wobble);
   z-index: 0;
 }
 
-.title-card .paper-stage,
-.end-card .paper-stage {
-  z-index: 0;
-}
-
-.title-card h1,
-.end-card .doors,
-.end-card .foot,
-.eyebrow,
-.lede,
-.scroll-hint {
+.title-copy,
+.cutout {
   position: relative;
   z-index: 1;
 }
 
-.eyebrow,
-.stack,
-.card-no,
-.panel-no,
-.scroll-hint {
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+h1 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(3.4rem, 11vw, 9rem);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  margin: 14px 0 22px;
   text-transform: uppercase;
 }
 
-h1 {
-  font-size: clamp(2.6rem, 9vw, 5.2rem);
-  line-height: 1;
-  margin: 8px 0 18px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
 .lede {
-  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
-  color: var(--muted);
-  max-width: 52ch;
+  font-size: clamp(1.15rem, 2.1vw, 1.45rem);
+  line-height: 1.4;
+  max-width: 34ch;
   margin: 0;
 }
 
-.scroll-hint {
-  margin-top: 40px;
+.scroll-cue {
+  margin-top: 36px;
 }
 
-/* Torn colour bars on the title card. */
-.bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 22px;
-  mask: url('/vox/torn.svg') 0 50% / 100% 100% no-repeat;
-  z-index: 0;
+.cutout {
+  margin: 0;
+  justify-self: center;
+  width: min(440px, 100%);
+  rotate: 2deg;
 }
-.bar-blue { top: 14%; background: #2f6fdb; }
-.bar-red { top: 46%; background: #d9482b; }
-.bar-yellow { top: 78%; background: #e8b923; }
 
-.chapter,
-.title-card,
-.end-card {
-  position: relative;
+/* The cut-out is transparent around the head, so tape sits on the paper border. */
+.cutout .tape-head {
+  top: -3%;
+  left: 36%;
+  width: 36%;
+  rotate: -8deg;
 }
+
+.cutout .tape-shoulder {
+  top: 54%;
+  left: -6%;
+  width: 30%;
+  rotate: 58deg;
+}
+
+/* ---------- Chapters: tall section, pinned stage */
 
 .chapter {
+  position: relative;
   height: calc(var(--len) * 100svh);
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .card {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  background: var(--c);
-  transform: translateY(calc(var(--t) * -100%));
+  z-index: 5;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 16px;
-  color: #fbf8f0;
-  max-width: none;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -54px;
-  height: 60px;
+  padding: 0 max(20px, 8vw);
   background: var(--c);
-  mask: url('/vox/torn.svg') 0 0 / 100% 100% no-repeat;
+  color: #fffaf0;
+  transform: translateY(calc(var(--t) * -115%));
 }
 
-.card h2 {
-  font-size: clamp(3rem, 12vw, 7rem);
-  margin: 0;
-  font-weight: 600;
+.card-n {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(6rem, 24vw, 17rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+}
+
+.card-title {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2.4rem, 7.5vw, 6rem);
+  line-height: 0.95;
   letter-spacing: -0.03em;
-  padding-left: max(0px, calc((100vw - 880px) / 2));
+  margin: 0.25em 0 0;
 }
 
-.card-no {
-  color: rgba(251, 248, 240, 0.8);
-  padding-left: max(0px, calc((100vw - 880px) / 2));
+.card-edge {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 100%;
+  height: 40px;
+  margin-top: -20px;
+  filter: url(#wobble);
 }
 
-/* Highlighter: yellow swipes left to right behind a phrase. */
+/* The camera only ever gets a transform. No will-change: it zooms text. */
+.cam {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- 01: the highlighted document */
+
+.sheet {
+  width: min(780px, 88vw);
+  padding: clamp(26px, 5vw, 60px);
+  background: var(--sheet);
+  box-shadow: var(--lift);
+  font-size: clamp(1.3rem, 3.3vw, 2.2rem);
+  line-height: 1.38;
+  rotate: -0.6deg;
+  isolation: isolate;
+}
+
+.sheet-head {
+  margin: 0 0 1.4em;
+  padding-bottom: 0.9em;
+  border-bottom: 1px solid #d8d1c0;
+  font-size: 0.75rem;
+}
+
+.line {
+  margin: 0 0 0.8em;
+}
+
+.line:last-child {
+  margin-bottom: 0;
+}
+
 .hl {
   position: relative;
-  display: inline-block;
+  background: none;
+  color: inherit;
   white-space: nowrap;
-  isolation: auto;
 }
 
 .hl::before {
   content: '';
   position: absolute;
-  inset: -2px -6px;
-  background: #ffd23f;
-  mask: url('/vox/highlighter.svg') 0 0 / 100% 100% no-repeat;
-  -webkit-mask: url('/vox/highlighter.svg') 0 0 / 100% 100% no-repeat;
+  inset: 0.04em -0.34em -0.02em -0.22em;
+  z-index: -1;
+  background: var(--highlight);
+  -webkit-mask: url('/vox/highlighter.webp') 0 0 / 100% 100% no-repeat;
+  mask: url('/vox/highlighter.webp') 0 0 / 100% 100% no-repeat;
   clip-path: inset(0 calc((1 - var(--t)) * 100%) 0 0);
   mix-blend-mode: multiply;
-  z-index: -1;
 }
 
-/* Marker circle: scanned ellipse intersected with a conic sweep. */
 .ring {
   position: relative;
   display: inline-block;
-  white-space: nowrap;
+  padding: 0 0.14em;
+  font-weight: 500;
 }
 
+/* Red-inked ellipse revealed by a conic sweep, so it draws itself.
+   A pre-coloured image with one mask, not two intersected masks:
+   Chrome leaks a faint box at the layer edge when a rotated camera
+   composites a red fill through intersected masks. */
 .ring::after {
   content: '';
   position: absolute;
-  inset: -22% -10%;
-  background: #d9302a;
-  mask: url('/vox/circle.svg') center / 100% 100% no-repeat,
-    conic-gradient(from 20deg, #000 calc(var(--t) * 360deg), transparent 0);
-  mask-composite: intersect;
-  -webkit-mask: url('/vox/circle.svg') center / 100% 100% no-repeat,
-    conic-gradient(from 20deg, #000 calc(var(--t) * 360deg), transparent 0);
-  -webkit-mask-composite: source-in;
-  z-index: -1;
+  inset: -0.36em -0.5em;
   pointer-events: none;
+  background: url('/vox/circle-red.webp') center / 100% 100% no-repeat;
+  mask: conic-gradient(from 290deg, #000 calc(var(--t) * 360deg), transparent 0);
 }
 
-/* Camera wrapper: transform only, no will-change. */
-.doc {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(880px, 92vw);
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  font-size: clamp(1.5rem, 4.6vw, 2.9rem);
-  line-height: 1.25;
-  font-weight: 500;
-  color: var(--ink);
-  background: var(--paper-bg);
-  padding: 48px 40px;
-  border: 1px solid var(--rule);
-}
+/* ---------- 02: the timeline, three panels side by side */
 
-.doc-line {
-  margin: 0 0 0.6em;
-}
-
-/* Entrance: the slap lands oversized and turned, then eases out. */
-.slap {
-  opacity: clamp(0, calc(var(--t) * 4), 1);
-  --e: calc((1 - var(--t)) * (1 - var(--t)));
-  transform: rotate(calc(var(--r, 0deg) - 6deg * var(--e))) scale(calc(1 + 0.3 * var(--e)));
-}
-
-.learn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(880px, 92vw);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  z-index: 1;
-}
-
-.learn li {
-  background: var(--paper-bg);
-  border: 1px solid var(--rule);
-  padding: 22px 24px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.learn strong {
-  display: block;
-  font-size: 1.25rem;
-  margin-bottom: 4px;
-}
-
-.learn span {
-  color: var(--muted);
-}
-
-/* Timeline: three panels, the camera pans between them. */
-.pan {
+.track {
   position: absolute;
   inset: 0;
   width: 300%;
   display: flex;
-  z-index: 1;
 }
 
 .panel {
   position: relative;
-  width: 33.3333%;
+  width: calc(100% / 3);
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 max(16px, calc((100vw - 880px) / 2 + 16px));
-  background: var(--paper-bg);
-  border-right: 1px solid var(--rule);
+  display: grid;
+  place-items: center;
+  padding: 0 6vw;
 }
 
-.panel h3 {
-  font-size: clamp(2rem, 6vw, 3.4rem);
-  margin: 8px 0 14px;
-  font-weight: 600;
+.panel-label {
+  position: absolute;
+  top: 8svh;
+  left: 6vw;
+  margin: 0;
+}
+
+.panel-body {
+  position: relative;
+  width: min(1040px, 100%);
+  height: min(580px, 70svh);
+}
+
+.shot,
+.clipping {
+  position: absolute;
+  left: 0;
+  top: 4%;
+  width: 62%;
+}
+
+.shot {
+  padding: 10px;
+  background: #fff;
+  box-shadow: var(--lift);
+}
+
+.clipping {
+  padding: clamp(22px, 3vw, 40px);
+  background: var(--sheet);
+  box-shadow: var(--lift);
+}
+
+.clip-kicker {
+  margin: 0 0 12px;
+}
+
+.clip-name {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(2.4rem, 6vw, 4.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+}
+
+.clip-stack {
+  margin: 0;
+  color: var(--ink);
+}
+
+.note {
+  position: absolute;
+  right: 0;
+  top: 32%;
+  width: 40%;
+  padding: 26px 26px 22px;
+  background: #fffdf7;
+  box-shadow: var(--lift);
+  font-size: 1.12rem;
+  line-height: 1.45;
+}
+
+.note h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  line-height: 1;
   letter-spacing: -0.02em;
+  margin: 0 0 10px;
 }
 
-.panel p {
-  margin: 0 0 10px;
-  max-width: 48ch;
-  font-size: 1.1rem;
+.note p {
+  margin: 0;
+}
+
+.note .note-stack {
+  margin-top: 14px;
 }
 
 .pin {
   position: absolute;
-  width: 180px;
-  opacity: 0.9;
-  transform: rotate(-4deg);
+  top: -26px;
+  left: 50%;
+  width: 46px;
+  translate: -50% 0;
 }
-.pin-top { top: 12%; right: 12%; }
-.pin-middle { top: 54%; right: 9%; transform: rotate(5deg); }
-.pin-bottom { bottom: 10%; right: 14%; transform: rotate(-2deg); }
 
-/* End card. */
-.end-card .paper-stage {
-  height: 100svh;
-  min-height: 60vh;
+.stat {
+  position: absolute;
+  left: 34%;
+  bottom: 2%;
+  padding: 12px 20px;
+  background: var(--c);
+  color: #fffaf0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.3rem, 2.6vw, 2.1rem);
+  letter-spacing: -0.01em;
+  box-shadow: var(--lift);
+}
+
+/* ---------- 03: map, pin, cards */
+
+.map {
+  position: absolute;
+  left: 6vw;
+  top: 50%;
+  width: min(54vw, 760px);
+  margin: 0;
+  padding: 10px;
+  background: #fff;
+  box-shadow: var(--lift);
+  translate: 0 -50%;
+  rotate: -1.2deg;
+}
+
+.map-pin {
+  position: absolute;
+  width: 48px;
+  translate: -62% -88%;
+}
+
+.map-tag,
+.map-now {
+  position: absolute;
+  padding: 6px 12px;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  white-space: nowrap;
+  box-shadow: var(--lift);
+}
+
+.map-tag {
+  background: #fffdf7;
+  translate: 18px -50%;
+}
+
+.map-now {
+  left: 3%;
+  top: 22%;
+  background: var(--red);
+  color: #fffaf0;
+}
+
+.learn {
+  position: absolute;
+  right: 6vw;
+  top: 50%;
+  width: min(34vw, 440px);
+  display: grid;
+  gap: 18px;
+  translate: 0 -50%;
+}
+
+.learn-card {
+  padding: 18px 22px;
+  background: #fffdf7;
+  box-shadow: var(--lift);
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.learn-card strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+/* Tail at the Thane pin, head pointing up-left: west, toward New Jersey. */
+.ink-arrow {
+  position: absolute;
+  left: 8%;
+  top: 33%;
+  width: 26%;
+  aspect-ratio: 600 / 360;
+  background: var(--red);
+  -webkit-mask: url('/vox/arrow.webp') center / 100% 100% no-repeat;
+  mask: url('/vox/arrow.webp') center / 100% 100% no-repeat;
+  scale: -1 1;
+  filter: url(#wobble);
+}
+
+/* ---------- End card */
+
+.end {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  align-items: center;
+  padding: 12svh max(16px, 8vw);
+}
+
+.end-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.end h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2rem, 5.4vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: 14px 0 28px;
 }
 
 .doors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 28px;
+  display: grid;
+  gap: 0;
+  max-width: 620px;
 }
 
-.doors a {
-  color: var(--accent);
+/* The torn strip's solid band is the middle half, so the padding is generous. */
+.door {
+  display: block;
+  padding: 40px 34px;
+  color: #fffaf0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3.6vw, 2.4rem);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
-  font-size: 1.2rem;
-  padding-bottom: 2px;
+  transition: translate 0.25s ease;
 }
 
-.foot {
-  margin-top: 56px;
-  font-size: 0.85rem;
-  color: var(--muted);
+.door:hover,
+.door:focus-visible {
+  translate: 10px 0;
 }
 
-/* Reduced motion: no loop, everything shown, nothing sticky or moving. */
+.door:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.credit {
+  margin-top: 36px;
+}
+
+/* ---------- Phones */
+
+@media (max-width: 640px) {
+  .title {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-top: 12svh;
+  }
+
+  .cutout {
+    width: min(300px, 80vw);
+  }
+
+  .panel {
+    padding: 0 16px;
+  }
+
+  .panel-label {
+    top: 6svh;
+    left: 16px;
+  }
+
+  .panel-body {
+    height: 76svh;
+  }
+
+  .shot,
+  .clipping {
+    width: 100%;
+    top: 4%;
+  }
+
+  .note {
+    width: 88%;
+    top: 46%;
+    font-size: 1rem;
+  }
+
+  .stat {
+    left: 4%;
+    bottom: 0;
+  }
+
+  .map {
+    left: 50%;
+    top: 8svh;
+    width: 92vw;
+    translate: -50% 0;
+  }
+
+  .learn {
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 5svh;
+    width: auto;
+    gap: 10px;
+    translate: none;
+  }
+
+  .learn-card {
+    padding: 12px 16px;
+    font-size: 0.92rem;
+  }
+
+  .learn-card strong {
+    font-size: 1.1rem;
+  }
+}
+
+/* ---------- Reduced motion: no loop, everything visible, nothing moves */
+
 .still {
   --p: 1;
 }
@@ -377,48 +662,78 @@ h1 {
 .still .stage {
   position: relative;
   height: auto;
-  min-height: 100svh;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-bottom: 80px;
 }
 
-.still .pan {
+.still .card {
   position: relative;
   inset: auto;
+  min-height: 60svh;
+  margin-bottom: 60px;
+  transform: none;
+}
+
+.still .cam,
+.still .track {
+  position: relative;
+  inset: auto;
+  transform: none;
+}
+
+.still .cam {
+  display: block;
+  padding: 0 max(16px, 6vw);
+}
+
+.still .sheet {
+  margin: 0 auto;
+}
+
+.still .track {
   width: 100%;
   flex-direction: column;
-  transform: none !important;
 }
 
 .still .panel {
   width: 100%;
-  min-height: 60vh;
+  height: auto;
+  display: block;
+  padding: 40px max(16px, 6vw);
 }
 
-.still .card {
-  position: relative;
-  min-height: 40vh;
-  transform: none;
+.still .panel-label {
+  position: static;
+  margin-bottom: 24px;
 }
 
-.still .doc,
+.still .panel-body {
+  height: auto;
+  display: grid;
+  justify-items: start;
+  gap: 32px;
+}
+
+.still .panel-body > *,
+.still .map,
 .still .learn {
   position: relative;
+  inset: auto;
   left: auto;
+  right: auto;
   top: auto;
-  transform: none;
-  margin: 40px auto;
+  bottom: auto;
+  width: auto;
+  max-width: 760px;
+  translate: none;
 }
 
-.still .doc,
-.still .learn,
-.still .card {
-  --t: 1;
+.still .learn {
+  margin-top: 40px;
 }
 
-@media (max-width: 640px) {
-  .doc {
-    padding: 32px 22px;
-  }
-  .pin {
-    width: 120px;
-  }
+.still .map-pin,
+.still .ink-arrow {
+  position: absolute;
 }

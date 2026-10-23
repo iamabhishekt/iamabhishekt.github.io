@@ -1,0 +1,46 @@
+{
+  "name": "Abhishek Thakur",
+  "handle": "iamabhishekt",
+  "tagline": "From Thane, working in New Jersey at Limosys in React, TypeScript and JavaScript. Learning Rust and forward-deployed engineering in public.",
+  "home": { "city": "Thane", "country": "India", "pin": { "left": "34%", "top": "52.2%" } },
+  "now": { "place": "New Jersey, USA", "why": "for work" },
+  "stats": {
+    "kmFromHome": "12,500",
+    "shellStages": 76
+  },
+  "build": [
+    {
+      "label": "01 / Storefront",
+      "name": "Sattvora Storefront",
+      "summary": "React 19 storefront for Sattvora Enterprises: catalogue, cart, checkout flow and an admin panel.",
+      "stat": "Live on Vercel",
+      "stack": "React · TypeScript · Tailwind",
+      "shot": "/vox/shot-sattvora.webp",
+      "href": "https://ecommerce-website-ashy-one.vercel.app"
+    },
+    {
+      "label": "02 / Hackathon",
+      "name": "DataOps Copilot",
+      "summary": "Agent Harness hackathon build on TrueForge: an agent that investigates data issues with guardrails.",
+      "stat": "Hackathon build",
+      "stack": "TypeScript · SQL · Agents"
+    },
+    {
+      "label": "03 / Next up",
+      "name": "Build your own X",
+      "summary": "Rebuilding the tools I use from scratch, in public: a shell in Rust, Redis in C, then a database and a web server.",
+      "stat": "Coming soon",
+      "stack": "Rust · C · from scratch"
+    }
+  ],
+  "learn": [
+    { "name": "Rust", "note": "Building a POSIX shell from scratch on CodeCrafters, one stage at a time." },
+    { "name": "Forward-deployed engineering", "note": "Shipping agents into real customer data, with guardrails first." },
+    { "name": "Java", "note": "Back through the JVM, concurrency and Spring Boot patterns." }
+  ],
+  "links": [
+    { "label": "GitHub", "href": "https://github.com/iamabhishekt", "color": "#2f5fd0" },
+    { "label": "LinkedIn", "href": "https://linkedin.com/in/iamabhishekt", "color": "#d6402a" },
+    { "label": "Email", "href": "mailto:abhishekthakur.art@protonmail.com", "color": "#e3b021" }
+  ]
+}

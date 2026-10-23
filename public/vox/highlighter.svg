@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
-  <filter id="w" x="-5%" y="-10%" width="110%" height="120%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.04 0.5" numOctaves="2" seed="7"/>
-    <feDisplacementMap in="SourceGraphic" scale="14" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-  <path filter="url(#w)" fill="#000" d="M18 46 L572 36 Q598 40 586 100 Q590 158 566 166 L24 176 Q4 170 12 110 Q6 58 18 46 Z"/>
-</svg>

@@ -1,59 +1,235 @@
 import { useEffect, useRef, useState } from 'react'
 import { useClock } from './useClock.js'
+import content from './data/content.json'
+
+const { stats, build, learn, links, home, now } = content
 
 const cam = (keys) => JSON.stringify(keys)
-
-const projects = [
-  {
-    name: 'AIO Wealth Hub',
-    summary: 'Personal finance platform with a Rust and SQLite ledger and a React dashboard.',
-    stack: 'Rust · SQLite · React · TypeScript',
-    pin: 'top',
-  },
-  {
-    name: 'Sattvora Storefront',
-    summary: 'React 19 ecommerce storefront with cart, checkout flow and an admin panel.',
-    stack: 'React · JavaScript · Tailwind',
-    pin: 'middle',
-  },
-  {
-    name: 'DataOps Copilot',
-    summary: 'Hackathon build on TrueForge: an agent-assisted data operations copilot.',
-    stack: 'TypeScript · SQL · Agents',
-    pin: 'bottom',
-  },
-]
-
-const learning = [
-  { name: 'Rust', note: 'Building a shell from scratch, one CodeCrafters stage at a time.' },
-  { name: 'Forward-deployed engineering', note: 'Learning the workflow of shipping into customer environments.' },
-  { name: 'Java', note: 'Going back through the JVM and Spring Boot patterns.' },
-]
+const win = (a, b, extra) => ({ '--a': a, '--b': b, ...extra })
 
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(false)
+  const [reduced, setReduced] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  )
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
     const sync = () => setReduced(mq.matches)
-    sync()
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
   return reduced
 }
 
-function Chapter({ number, title, color, len, children }) {
+function Mark({ a, b, children }) {
   return (
-    <section className="chapter" data-chapter style={{ '--len': len }}>
+    <mark className="k hl" style={win(a, b)}>
+      {children}
+    </mark>
+  )
+}
+
+function Ring({ a, b, children }) {
+  return (
+    <span className="k ring" style={win(a, b)}>
+      {children}
+    </span>
+  )
+}
+
+function Slap({ a, b, r = 0, className = '', style, children }) {
+  return (
+    <div className={`k slap ${className}`} style={win(a, b, { '--r': `${r}deg`, ...style })}>
+      {children}
+    </div>
+  )
+}
+
+function Chapter({ n, title, color, len, children }) {
+  return (
+    <section className="chapter" data-chapter style={{ '--len': len, '--c': color }}>
       <div className="stage">
-        <div className="grain" />
-        <div className="card timed" style={{ '--a': 0.06, '--b': 0.14, '--c': color }}>
-          <span className="card-no">{number}</span>
-          <h2>{title}</h2>
+        <div className="k card" style={win(0.06, 0.14)}>
+          <span className="card-n">{n}</span>
+          <h2 className="card-title">{title}</h2>
+          <span className="torn card-edge" aria-hidden="true" />
         </div>
         {children}
+        <div className="grain" aria-hidden="true" />
       </div>
     </section>
+  )
+}
+
+function TitleCard() {
+  return (
+    <header className="title">
+      <span className="torn bar" style={{ '--c': links[0].color, top: '7%' }} aria-hidden="true" />
+      <span className="torn bar" style={{ '--c': links[1].color, top: '82%', left: '38%' }} aria-hidden="true" />
+      <span className="torn bar" style={{ '--c': links[2].color, top: '92%', right: '45%' }} aria-hidden="true" />
+      <div className="title-copy">
+        <p className="kicker">An explainer in three chapters</p>
+        <h1>
+          Abhishek
+          <br />
+          Thakur
+        </h1>
+        <p className="lede">{content.tagline}</p>
+        <p className="scroll-cue">Scroll to play</p>
+      </div>
+      <figure className="cutout">
+        <img src="/vox/cutout.webp" alt="Abhishek Thakur as a halftone newspaper cut-out" width="900" height="891" />
+        <img className="tape tape-head" src="/vox/tape-1.webp" alt="" />
+        <img className="tape tape-shoulder" src="/vox/tape-2.webp" alt="" />
+      </figure>
+      <div className="grain" aria-hidden="true" />
+    </header>
+  )
+}
+
+function NumbersChapter() {
+  return (
+    <Chapter n="01" title="The numbers" color="#2f5fd0" len={4}>
+      <div
+        className="cam"
+        data-cam={cam([
+          [0.12, 0, 0, 1.2, -2],
+          [0.22, 6, 17, 1.45, -1],
+          [0.4, -4, 1, 1.45, 0],
+          [0.6, -2, -15, 1.45, 1],
+          [0.82, 0, 0, 1, 0],
+        ])}
+      >
+        <article className="sheet">
+          <p className="sheet-head">File 01 &middot; {content.handle}</p>
+          <p className="line">
+            I&rsquo;m from {home.city}, working in {now.place.split(',')[0]}:{' '}
+            <Mark a={0.22} b={0.32}>{stats.kmFromHome} km from home</Mark>.
+          </p>
+          <p className="line">
+            By day at Limosys, I build interfaces in <Mark a={0.42} b={0.52}>React and TypeScript</Mark>.
+          </p>
+          <p className="line">
+            After hours, a shell in Rust: <Ring a={0.62} b={0.72}>{stats.shellStages}</Ring> stages to go.
+          </p>
+        </article>
+      </div>
+    </Chapter>
+  )
+}
+
+const PANEL_START = [0.16, 0.46, 0.76]
+
+function BuildChapter() {
+  return (
+    <Chapter n="02" title="What I build" color="#d6402a" len={5}>
+      <div
+        className="track"
+        data-pan
+        data-cam={cam([
+          [0.14, 0, 0, 1, 0],
+          [0.36, 0, 0, 1, 0],
+          [0.44, -33.3333, 0, 1, 0],
+          [0.66, -33.3333, 0, 1, 0],
+          [0.74, -66.6667, 0, 1, 0],
+          [1, -66.6667, 0, 1, 0],
+        ])}
+      >
+        {build.map((item, i) => {
+          const t0 = PANEL_START[i]
+          return (
+            <div className="panel" key={item.name}>
+              <p className="panel-label">{item.label}</p>
+              <div className="panel-body">
+                {item.shot ? (
+                  <Slap a={t0} b={t0 + 0.06} r={-2} className="shot">
+                    <a href={item.href}>
+                      <img src={item.shot} alt={`${item.name} home page`} width="1100" height="688" />
+                    </a>
+                    <img className="tape tape-a" src="/vox/tape-3.webp" alt="" />
+                    <img className="tape tape-b" src="/vox/tape-1.webp" alt="" />
+                  </Slap>
+                ) : (
+                  <Slap a={t0} b={t0 + 0.06} r={-1.5} className="clipping">
+                    <p className="clip-kicker">Case file</p>
+                    <p className="clip-name">{item.name}</p>
+                    <p className="clip-stack">{item.stack}</p>
+                    <img className="tape tape-a" src="/vox/tape-2.webp" alt="" />
+                  </Slap>
+                )}
+                <Slap a={t0 + 0.05} b={t0 + 0.1} r={2} className="note">
+                  <img className="pin" src="/vox/pin.webp" alt="" />
+                  <h3>{item.name}</h3>
+                  <p>{item.summary}</p>
+                  {item.shot && <p className="note-stack">{item.stack}</p>}
+                </Slap>
+                <Slap a={t0 + 0.1} b={t0 + 0.15} r={-4} className="stat">
+                  {item.stat}
+                </Slap>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </Chapter>
+  )
+}
+
+function LearnChapter() {
+  return (
+    <Chapter n="03" title="What I'm learning" color="#e3b021" len={4}>
+      <div
+        className="cam"
+        data-cam={cam([
+          [0.12, 0, 0, 1.15, 1],
+          [0.28, 4, 2, 1.3, 0],
+          [0.6, -3, 0, 1.15, -1],
+          [0.86, 0, 0, 1, 0],
+        ])}
+      >
+        <figure className="map">
+          <img src="/vox/map.webp" alt="Printed map of South Asia" width="1200" height="900" />
+          <img className="tape tape-a" src="/vox/tape-3.webp" alt="" />
+          <Slap a={0.2} b={0.28} className="map-pin" style={home.pin}>
+            <img src="/vox/pin.webp" alt="" />
+          </Slap>
+          <Slap a={0.24} b={0.32} r={-3} className="map-tag" style={home.pin}>
+            Home: {home.city}
+          </Slap>
+          <Slap a={0.68} b={0.76} className="ink-arrow" />
+          <Slap a={0.72} b={0.8} r={2} className="map-now">
+            Now: {now.place}, {now.why}
+          </Slap>
+        </figure>
+        <div className="learn">
+          {learn.map((item, i) => (
+            <Slap key={item.name} a={0.32 + i * 0.12} b={0.4 + i * 0.12} r={i % 2 ? 2 : -2} className="learn-card">
+              <strong>{item.name}</strong>
+              <span>{item.note}</span>
+            </Slap>
+          ))}
+        </div>
+      </div>
+    </Chapter>
+  )
+}
+
+function EndCard() {
+  return (
+    <footer className="end">
+      <div className="end-copy">
+        <p className="kicker">Next chapter</p>
+        <h2>A devlog of what each project teaches me, in writing first, then video.</h2>
+        <nav className="doors" aria-label="Contact">
+          {links.map((link) => (
+            <a key={link.label} className="torn door" style={{ '--c': link.color }} href={link.href}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+        <p className="credit">Paper, ink and halftone drawn in code. React and plain CSS, no animation library.</p>
+      </div>
+      <div className="grain" aria-hidden="true" />
+    </footer>
   )
 }
 
@@ -63,97 +239,20 @@ export default function App() {
   useClock(rootRef, !reduced)
 
   return (
-    <div className={`page${reduced ? ' still' : ''}`} ref={rootRef}>
-      <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
-        <filter id="wobble" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="2" />
+    <div className={reduced ? 'page still' : 'page'} ref={rootRef}>
+      <svg className="defs" aria-hidden="true">
+        <filter id="wobble">
+          <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="1" />
           <feDisplacementMap in="SourceGraphic" scale="4" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-
-      <section className="title-card">
-        <div className="paper-stage">
-          <div className="grain" />
-          <span className="bar bar-blue" />
-          <span className="bar bar-red" />
-          <span className="bar bar-yellow" />
-          <p className="eyebrow">abhishek@github ~ $ whoami</p>
-          <h1>Abhishek Thakur</h1>
-          <p className="lede">Front-end engineering in React, TypeScript and JavaScript. Learning Rust and forward-deployed engineering in public.</p>
-          <p className="scroll-hint">Scroll</p>
-        </div>
-      </section>
-
-      <Chapter number="01" title="Now" color="#2f6fdb" len={3}>
-        <div className="doc timed" style={{ '--a': 0.12, '--b': 0.92 }} data-cam={cam([
-          [0.12, 0, 0, 1.25, -2],
-          [0.2, 8, 14, 1.55, -1],
-          [0.46, -6, 2, 1.5, 0],
-          [0.92, 0, 0, 1, 0],
-        ])}>
-          <p className="doc-line">
-            <span className="timed hl" style={{ '--a': 0.2, '--b': 0.3 }}>Working at Limosys</span>, building
-            interfaces in React and TypeScript.
-          </p>
-          <p className="doc-line">
-            Backend in{' '}
-            <span className="timed ring" style={{ '--a': 0.46, '--b': 0.56 }}>
-              Java and Rust
-            </span>
-            , with Rust in progress.
-          </p>
-          <p className="doc-line">Next: the devlog, one project at a time.</p>
-        </div>
-      </Chapter>
-
-      <Chapter number="02" title="Work" color="#d9482b" len={4}>
-        <div className="pan timed" style={{ '--a': 0.2, '--b': 0.9 }} data-cam={cam([
-          [0.2, 0, 0, 1, 0],
-          [0.5, -33.3, 0, 1, 0],
-          [0.85, -66.6, 0, 1, 0],
-        ])}>
-          {projects.map((p, i) => (
-            <article className="panel" key={p.name}>
-              <img className={`pin pin-${p.pin}`} src="/vox/tape.svg" alt="" />
-              <p className="panel-no">0{i + 1}</p>
-              <h3>{p.name}</h3>
-              <p>{p.summary}</p>
-              <p className="stack">{p.stack}</p>
-            </article>
-          ))}
-        </div>
-      </Chapter>
-
-      <Chapter number="03" title="Learning" color="#e8b923" len={3}>
-        <ul className="learn">
-          {learning.map((l, i) => (
-            <li key={l.name} className="timed slap" style={{ '--a': 0.2 + i * 0.18, '--b': 0.34 + i * 0.18, '--r': `${i % 2 ? 2 : -2}deg` }}>
-              <strong>{l.name}</strong>
-              <span>{l.note}</span>
-            </li>
-          ))}
-        </ul>
-      </Chapter>
-
-      <Chapter number="04" title="Devlog" color="#2a8a5a" len={2}>
-        <div className="doc timed" style={{ '--a': 0.2, '--b': 0.5 }}>
-          <p className="doc-line">Short notes on what I learn from each project, in writing first, then video.</p>
-          <p className="doc-line">The first entries are on the way.</p>
-        </div>
-      </Chapter>
-
-      <section className="end-card">
-        <div className="paper-stage">
-          <div className="grain" />
-          <p className="eyebrow">Keep reading</p>
-          <nav className="doors">
-            <a href="https://github.com/iamabhishekt">GitHub</a>
-            <a href="https://linkedin.com/in/iamabhishekt">LinkedIn</a>
-            <a href="mailto:abhishekthakur.art@protonmail.com">Email</a>
-          </nav>
-          <p className="foot">Built with React and Vite. Hosted on GitHub Pages.</p>
-        </div>
-      </section>
+      <TitleCard />
+      <main>
+        <NumbersChapter />
+        <BuildChapter />
+        <LearnChapter />
+      </main>
+      <EndCard />
     </div>
   )
 }
