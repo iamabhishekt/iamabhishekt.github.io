@@ -2,7 +2,18 @@
 
 My portfolio (a Vox-style scroll explainer) and devlog. Astro + React, deployed to GitHub Pages by `.github/workflows/pages.yml` on every push to `main`.
 
-## Write a post
+## Write a post in the editor
+
+Open https://app.pagescms.org, log in with GitHub and pick this repo. **Posts** lists every post. **Add an entry** gives a form for the header and a rich-text editor for the post: type `/` for headings, lists, quotes, tables and code blocks, and drag images straight in (they land in `public/blog/`).
+
+- New posts start as **Draft**. Untick it and **Save** to publish; every save is a commit, live about a minute later.
+- Diagram: insert a code block, set its language to `mermaid`, write the diagram.
+- Highlight: type `==the line that matters==`.
+- The **Source** switch shows the Markdown if you ever want it.
+
+The editor is configured by `.pages.yml`.
+
+## Write a post locally
 
 ```bash
 npm install            # once
@@ -30,7 +41,7 @@ You can also write straight on GitHub: open `src/content/blog/`, **Add file**, w
 | --- | --- |
 | ` ```mermaid ` block | A diagram (flowchart, sequence, state, class...), drawn on a taped sheet |
 | ` ```rust ` or any language | Highlighted code with a **Copy** button |
-| `<mark>key line</mark>` | A highlighter stroke |
+| `==key line==` | A highlighter stroke |
 | `> text` | A callout |
 | `---` | A torn-paper divider |
 | `![alt](/blog/<slug>/image.png)` | An image; put the file in `public/blog/<slug>/` |

@@ -1,0 +1,58 @@
+# Editor for the devlog: https://app.pagescms.org (log in with GitHub, open this repo).
+# Saving commits to main, and the Pages workflow publishes it.
+media:
+  input: public/blog
+  output: /blog
+  categories: [image]
+  rename: safe
+
+content:
+  - name: posts
+    label: Posts
+    type: collection
+    path: src/content/blog
+    format: yaml-frontmatter
+    filename: '{primary}.md'
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: description
+        label: One-line summary
+        type: text
+        required: true
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: category
+        label: Category
+        type: select
+        required: true
+        default: learn
+        options:
+          values: [learn, build, devlog]
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: output
+        label: Live page to show at the top (optional, e.g. / or https://...)
+        type: string
+      - name: draft
+        label: Draft (hidden on the live site)
+        type: boolean
+        default: true
+      - name: body
+        label: Post
+        type: rich-text

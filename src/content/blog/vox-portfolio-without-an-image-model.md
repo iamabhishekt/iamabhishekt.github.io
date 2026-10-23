@@ -58,7 +58,7 @@ The ink assets are black on transparent, so the page uses them as CSS masks and 
 
 The marker circle was two masks intersected: the scanned ellipse and a conic sweep that opens as `--t` goes to 1. In isolation it rendered perfectly. On the page, a faint red box appeared around the number.
 
-The difference was the camera. The document sits inside a wrapper that zooms and rotates, and <mark>Chrome leaked a hairline of the red fill at the layer edge when it composited two intersected masks under a rotation</mark>. The fix was to stop asking for the intersection: I pre-coloured the ellipse red and kept a single conic mask.
+The difference was the camera. The document sits inside a wrapper that zooms and rotates, and ==Chrome leaked a hairline of the red fill at the layer edge when it composited two intersected masks under a rotation==. The fix was to stop asking for the intersection: I pre-coloured the ellipse red and kept a single conic mask.
 
 ```css
 .ring::after {

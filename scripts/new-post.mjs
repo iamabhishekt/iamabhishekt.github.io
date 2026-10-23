@@ -39,7 +39,7 @@ Open with the problem in one or two sentences.
 
 ## What I was trying to do
 
-Write normally. Wrap the line that matters in <mark>a highlighter</mark>.
+Write normally. Wrap the line that matters in ==a highlighter==.
 
 ## How it works
 
