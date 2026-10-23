@@ -8,7 +8,6 @@ tags:
   - ffsfsfsf
   - sfsfsdfsdf
   - fsdfsfsfsf
-output: dfsdfsfgsfs
 draft: true
 ---
 dfdsfsffsfsfsfs
