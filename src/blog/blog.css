@@ -9,7 +9,41 @@
   --serif: 'Newsreader', Georgia, serif;
   --mono: 'Geist Mono', ui-monospace, monospace;
   --lift: 0 1px 0 rgba(40, 30, 10, 0.08), 0 22px 44px -26px rgba(40, 30, 10, 0.4);
+  --on-ink: #fffaf0;
+  --paper-blend: normal;
+  --stroke: url('/vox/highlighter-yellow.webp');
   color-scheme: light;
+}
+
+/* Night paper: same texture and highlighter, charcoal sheet, chalk ink.
+   Follows the system unless the toggle stored a choice in data-theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #1d1b18;
+    --sheet: #282520;
+    --ink: #ece6d8;
+    --muted: #a59e8f;
+    --rule: #3b372f;
+    --lift: 0 1px 0 rgba(0, 0, 0, 0.35), 0 22px 44px -26px rgba(0, 0, 0, 0.85);
+    --on-ink: #1b1915;
+    --paper-blend: multiply;
+    /* The stroke is translucent; two coats keep it bright on charcoal. */
+    --stroke: url('/vox/highlighter-yellow.webp'), url('/vox/highlighter-yellow.webp');
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #1d1b18;
+  --sheet: #282520;
+  --ink: #ece6d8;
+  --muted: #a59e8f;
+  --rule: #3b372f;
+  --lift: 0 1px 0 rgba(0, 0, 0, 0.35), 0 22px 44px -26px rgba(0, 0, 0, 0.85);
+  --on-ink: #1b1915;
+  --paper-blend: multiply;
+  --stroke: url('/vox/highlighter-yellow.webp'), url('/vox/highlighter-yellow.webp');
+  color-scheme: dark;
 }
 
 * {
@@ -21,6 +55,7 @@ body.blog {
   color: var(--ink);
   background: var(--paper) url('/vox/paper.webp');
   background-size: 512px;
+  background-blend-mode: var(--paper-blend);
   font-family: var(--serif);
   -webkit-font-smoothing: antialiased;
 }
@@ -95,6 +130,29 @@ button:focus-visible {
   color: var(--ink);
 }
 
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -8px 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--sheet);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--ink);
+}
+
 .site-foot {
   position: relative;
   max-width: 1160px;
@@ -126,7 +184,7 @@ button:focus-visible {
   display: inline-block;
   padding: 3px 8px;
   background: var(--c, var(--ink));
-  color: #fffaf0;
+  color: var(--on-c, #fffaf0);
   font-size: 0.7rem;
 }
 
@@ -182,7 +240,11 @@ button:focus-visible {
 .filters button[aria-pressed='true'] {
   background: var(--c, var(--ink));
   border-color: var(--c, var(--ink));
-  color: #fffaf0;
+  color: var(--on-c, #fffaf0);
+}
+
+.filters [data-filter='all'] {
+  --on-c: var(--on-ink);
 }
 
 .empty {
@@ -285,7 +347,7 @@ button:focus-visible {
 
 .mode button[aria-pressed='true'] {
   background: var(--ink);
-  color: #fffaf0;
+  color: var(--on-ink);
 }
 
 .live {
@@ -412,23 +474,17 @@ button:focus-visible {
   text-decoration-thickness: 2px;
 }
 
-/* <mark> reads as a highlighter stroke. */
+/* <mark> reads as a highlighter stroke, redrawn on every line it wraps to.
+   The text is always dark ink, since the stroke is always yellow. */
 .prose mark {
-  position: relative;
-  background: none;
-  color: inherit;
-  isolation: isolate;
-}
-
-.prose mark::before {
-  content: '';
-  position: absolute;
-  inset: 0.08em -0.25em 0;
-  z-index: -1;
-  background: var(--highlight);
-  -webkit-mask: url('/vox/highlighter.webp') 0 0 / 100% 100% no-repeat;
-  mask: url('/vox/highlighter.webp') 0 0 / 100% 100% no-repeat;
-  mix-blend-mode: multiply;
+  padding: 0.05em 0.25em;
+  margin: 0 -0.1em;
+  color: #1b1915;
+  background-image: var(--stroke);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .prose blockquote {
@@ -442,6 +498,98 @@ button:focus-visible {
 
 .prose blockquote p:last-child {
   margin-bottom: 0;
+}
+
+/* > [!NOTE] callouts: a pinned card with a coloured label. */
+.prose .callout {
+  --k: #2f5fd0;
+  margin: 1.8em 0;
+  padding: 18px 24px 20px;
+  background: var(--sheet);
+  border-left: 4px solid var(--k);
+  box-shadow: var(--lift);
+  font-size: 1.08rem;
+}
+
+.prose .callout-tip {
+  --k: #2f8f5b;
+}
+
+.prose .callout-important {
+  --k: #e3b021;
+}
+
+.prose .callout-warning,
+.prose .callout-caution {
+  --k: #d6402a;
+}
+
+.prose .callout-label {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 3px 8px;
+  background: var(--k);
+  color: #fffaf0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+
+/* {term: word | meaning}: dotted word, definition card on hover or tap. */
+.prose .term {
+  position: relative;
+  text-decoration: underline dotted var(--c);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: help;
+}
+
+.prose .term-def {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 5;
+  width: max-content;
+  max-width: min(280px, 80vw);
+  padding: 10px 12px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  box-shadow: var(--lift);
+}
+
+.prose .term:hover .term-def,
+.prose .term:focus .term-def {
+  display: block;
+}
+
+.prose .term:focus-visible {
+  outline: 2px solid var(--c);
+  outline-offset: 2px;
+}
+
+/* Narrow screens: the definition slides up as a sheet, so it never runs off the edge. */
+@media (max-width: 860px) {
+  .prose .term-def {
+    position: fixed;
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    translate: none;
+    width: auto;
+    max-width: none;
+    font-size: 0.85rem;
+  }
 }
 
 .prose img {
@@ -509,6 +657,17 @@ button:focus-visible {
   box-shadow: var(--lift);
 }
 
+/* Shiki writes both themes; night paper switches to the dark colours. */
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark) !important;
+  }
+}
+
 .prose pre.has-copy,
 .agent pre.has-copy {
   padding-top: 44px;
@@ -528,7 +687,7 @@ button:focus-visible {
 
 .copy:hover {
   background: var(--ink);
-  color: #fffaf0;
+  color: var(--on-ink);
 }
 
 /* Mermaid output sits on a taped sheet. */
@@ -560,8 +719,9 @@ button:focus-visible {
 }
 
 .diagram-error::after {
-  content: 'Diagram error: ' attr(data-error);
+  content: attr(data-error);
   display: block;
+  white-space: normal;
   margin-top: 12px;
   color: #d6402a;
 }
@@ -572,6 +732,116 @@ button:focus-visible {
   gap: 12px;
   color: var(--muted);
   margin-top: 2.4em;
+}
+
+/* ---------- Demo blocks: a live stage over a strip of controls */
+
+.demo {
+  margin: 2em 0;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: var(--lift);
+}
+
+.demo-stage {
+  padding: 28px 24px;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+
+.demo-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 28px;
+  padding: 18px 24px 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.demo-control label,
+.demo-control fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.demo-control label {
+  justify-items: start;
+}
+
+.prose .demo-control code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.demo-control legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.demo-control input[type='range'] {
+  width: 100%;
+  accent-color: var(--c);
+}
+
+.demo-control fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demo-control input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+}
+
+.demo-control fieldset label {
+  padding: 5px 10px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.demo-control fieldset label:has(:checked) {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.demo-control fieldset label:has(:focus-visible) {
+  outline: 3px solid var(--c);
+  outline-offset: 2px;
+}
+
+/* ---------- Playground blocks (Sandpack) */
+
+.playground {
+  margin: 2em 0;
+  box-shadow: var(--lift);
+  --sp-layout-height: 340px;
+}
+
+.playground .sp-layout {
+  border-radius: 0;
+  border-color: var(--rule);
+}
+
+.playground-reset {
+  padding: 5px 10px;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 /* ---------- Agent view */

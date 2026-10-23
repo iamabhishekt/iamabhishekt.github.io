@@ -39,7 +39,11 @@ Open with the problem in one or two sentences.
 
 ## What I was trying to do
 
-Write normally. Wrap the line that matters in ==a highlighter==.
+Write normally. Wrap the line that matters in ==a highlighter==, and give a
+tricky word a hover definition: {term: latency | how long one request takes}.
+
+> [!NOTE]
+> Callouts: NOTE, TIP, IMPORTANT, WARNING or CAUTION on the first line.
 
 ## How it works
 
@@ -57,7 +61,27 @@ fn main() {
 }
 \`\`\`
 
-> A callout or a quote goes in a blockquote.
+A demo: each control line drives a CSS variable of the same name.
+
+\`\`\`demo
+gap: 0..48px = 16px
+direction: row | column
+---html
+<div class="row"><i>1</i><i>2</i><i>3</i></div>
+---css
+.row { display: flex; gap: var(--gap); flex-direction: var(--direction); }
+i { padding: 16px 20px; background: #2f5fd0; color: #fff; font-style: normal; }
+\`\`\`
+
+A playground readers can edit (HTML first, then ---css and ---js if you need them):
+
+\`\`\`playground
+<button class="btn">Press me</button>
+---css
+.btn { padding: 12px 20px; border: 2px solid; background: gold; }
+\`\`\`
+
+> A plain quote stays a quote.
 
 Images: put the file in public/blog/${slug}/ and link it like this:
 
