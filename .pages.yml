@@ -49,6 +49,9 @@ content:
       - name: output
         label: Live page to show at the top (optional, e.g. / or https://...)
         type: string
+        pattern:
+          regex: '^(/\S*|https?://\S+)?$'
+          message: 'Leave empty, or use a path like /projects/ or a full https:// link'
       - name: draft
         label: Draft (hidden on the live site)
         type: boolean

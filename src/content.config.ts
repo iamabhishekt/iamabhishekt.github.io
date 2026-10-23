@@ -9,8 +9,12 @@ const blog = defineCollection({
     date: z.coerce.date(),
     category: z.enum(['learn', 'build', 'devlog']),
     tags: z.array(z.string()).default([]),
-    // A live page this post is about, shown in a window at the top.
-    output: z.string().url().or(z.string().startsWith('/')).optional(),
+    // A live page this post is about, shown in a window at the top. The editor
+    // saves an emptied field as '' or null, which means "no live page".
+    output: z.preprocess(
+      (value) => (value === '' || value === null ? undefined : value),
+      z.string().url().or(z.string().startsWith('/')).optional(),
+    ),
     draft: z.boolean().default(false),
   }),
 })
